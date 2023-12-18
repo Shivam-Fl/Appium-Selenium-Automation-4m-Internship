@@ -1,10 +1,13 @@
+import base64
+import io
+import time
+from PIL import Image
 from appium import webdriver
 from typing import Any, Dict
 from appium.options.common import AppiumOptions
 from appium.webdriver.common.appiumby import AppiumBy
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
 
 def phonePe(user_input: str) -> Dict[str, str]:
     try:
@@ -28,10 +31,10 @@ def phonePe(user_input: str) -> Dict[str, str]:
         el.click()
 
         # Set explicit wait timeout
-        wait = WebDriverWait(driver, 10)
+        wait = WebDriverWait(driver, 15)
 
         # Find and click pay a mobile number option
-        el1 = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH, '//androidx.recyclerview.widget.RecyclerView[@resource-id="com.phonepe.app:id/recycler_view"]/android.view.ViewGroup[1]')))
+        el1 = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH, '(//androidx.recyclerview.widget.RecyclerView[@resource-id="com.phonepe.app:id/recycler_view"])[1]/android.view.ViewGroup[1]')))
         el1.click()
 
         # Find and click search bar
@@ -51,17 +54,25 @@ def phonePe(user_input: str) -> Dict[str, str]:
             (AppiumBy.XPATH, '//android.widget.TextView[@resource-id="com.phonepe.app:id/tvNumberName"]')))
         name = el4.text
 
+        #Find the profile picture and take a screenshot
+        el5 = wait.until(EC.visibility_of_element_located(
+            (AppiumBy.ID, 'com.phonepe.app:id/ivNumberImage')))
+        screenshot = el5.screenshot_as_png
+        ss = Image.open(io.BytesIO(screenshot))
+        imagebytes = io.BytesIO()
+        ss.save(imagebytes, format='PNG')
+        imagebytes.seek(0)
+        enc_image = base64.b64encode(imagebytes.getvalue()).decode('utf-8')
+        time.sleep(2)
+
         # Extract name and return it
-        return {"name": name}
+        return {"name": name, 'profile photo': enc_image}
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
         return {"error": str(e)}
-
     finally:
         driver.quit()
-
-
 if __name__ == "__main__":
     # Get user input for the 10-digit number
     user_input = input("Enter a 10-digit number: ")
@@ -71,4 +82,3 @@ if __name__ == "__main__":
     else:
         result = phonePe(user_input)
         print(result)
-
