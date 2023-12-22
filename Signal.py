@@ -81,6 +81,7 @@ def Signal(phone_number: str) -> Dict[str, str]:
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
+        driver.terminate_app('org.thoughtcrime.securesms')
         return {"error": str(e)}
     finally:
         driver.quit()
