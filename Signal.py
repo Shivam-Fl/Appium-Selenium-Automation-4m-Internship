@@ -58,6 +58,7 @@ def Signal(phone_number: str) -> Dict[str, str]:
             not_found_element = wait.until(
             EC.presence_of_all_elements_located((AppiumBy.XPATH, '//android.widget.TextView[@resource-id="android:id/message"]')))
             if not_found_element:
+                driver.terminate_app('org.thoughtcrime.securesms')
                 return {"Message": phone_number + ' is not a Signal user'}
 
             
@@ -73,7 +74,7 @@ def Signal(phone_number: str) -> Dict[str, str]:
             imagebytes.seek(0)
             enc_image = base64.b64encode(imagebytes.getvalue()).decode('utf-8')
             time.sleep(2)
-
+            driver.terminate_app('org.thoughtcrime.securesms')
             return {"Message": phone_number + ' is registered on Signal app', "profile_photo": enc_image}
 
         
