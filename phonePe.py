@@ -64,9 +64,11 @@ def phonePe(user_input: str) -> Dict[str, str]:
         imagebytes.seek(0)
         enc_image = base64.b64encode(imagebytes.getvalue()).decode('utf-8')
         time.sleep(2)
+        driver.terminate_app('com.phonepe.app')
 
         # Extract name and return it
         return {"name": name, 'profile photo': enc_image}
+       
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
