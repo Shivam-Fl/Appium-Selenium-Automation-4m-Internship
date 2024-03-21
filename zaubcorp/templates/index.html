@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Scraper</title>
+</head>
+<body>
+    <h1>Data Scraper</h1>
+    <form id="scrapeForm">
+        <label for="name">Enter Name:</label>
+        <input type="text" id="name" name="name">
+        <button type="submit">Scrape Data</button>
+    </form>
+    <div id="result"></div>
+    <form id="downloadForm" style="display: none;" action="/download" method="post">
+        <input type="hidden" id="jsonData" name="data">
+        <button type="button" id="downloadBtn">Download Excel</button>
+    </form>
+
+    <script>
+        document.getElementById('scrapeForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const response = await fetch('/scrape', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name: name })
+            });
+            const data = await response.json();
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+            if (!data.error) {
+                // uncomment below code if want to show results on frontend
+                // const dataList = document.createElement('ul');
+                // data.forEach(entry => {
+                //     const listItem = document.createElement('li');
+                //     listItem.textContent = `${entry.ID} - ${entry.Name} - ${entry.Company}`;
+                //     dataList.appendChild(listItem);
+                // });
+                // resultDiv.appendChild(dataList);
+                const downloadForm = document.getElementById('downloadForm');
+                downloadForm.style.display = 'block';
+                document.getElementById('jsonData').value = JSON.stringify(data);
+            } else {
+                resultDiv.textContent = data.error;
+            }
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', async function() {
+            const downloadForm = document.getElementById('downloadForm');
+            downloadForm.submit();
+        });
+    </script>
+</body>
+</html>
